@@ -1,0 +1,31 @@
+name: "daily allerts"
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    -   cron: "10 20 * * 1,2,3,4,5,6"
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    name: Backup
+    timeout-minutes: 25
+    steps:
+      -   uses: actions/checkout@v2
+      -   name: Set up Python 3.9
+          uses: actions/setup-python@v1
+          with:
+            python-version: 3.9
+
+      -   name: Setup dependencies
+          run: |
+            if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      -   name: Run backup
+          run: python main.py
+
+      -   name: Commit changes
+          uses: elstudio/actions-js-build/commit@v3
+          with:
+            commitMessage: Automated snapshot
